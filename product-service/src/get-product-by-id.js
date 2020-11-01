@@ -1,15 +1,24 @@
-import productList from './productList.json';
+import productsList from "./productList.json";
+import { generateResponse } from "./utils";
+const productsPromise = Promise.resolve(productsList);
 
 export const getProductById = async (event) => {
-  console.log('Lambda invocation with event: ', event);
-  // const { productId } = event ....
+  try {
+    const { productId } = event.pathParameters;
+    const productsData = await productsPromise;
+    const product = productsData.find((item) => item.id === productId);
 
-  // Some logic ...
-  // Don't forget about logging and testing
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(productList[0])
-  };
+    if (product) {
+      return generateResponse({ body: product });
+    }
+    return generateResponse({
+      code: 404,
+      body: { error: "Not found" },
+    });
+  } catch {
+    return generateResponse({
+      code: 500,
+      body: { error: "Cannot get product by id" },
+    });
+  }
 };
-

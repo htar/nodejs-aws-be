@@ -1,12 +1,15 @@
-import productList from './productList.json';
+import productsList from "./productList.json";
+import { generateResponse } from "./utils";
+const productsPromise = Promise.resolve(productsList);
 
-export const getAllProducts = async (event) => {
-  console.log('Lambda invocation with event: ', event);
-  // Some logic ...
-  // Don't forget about logging and testing
-  
-  return {
-    statusCode: 200,
-    body: JSON.stringify(productList)
-  };
+export const getAllProducts = async () => {
+  try {
+    const productsData = await productsPromise;
+    return generateResponse({ body: productsData });
+  } catch {
+    return generateResponse({
+      code: 500,
+      body: { error: "Cannot get list of products" },
+    });
+  }
 };
