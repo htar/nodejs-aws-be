@@ -1,13 +1,16 @@
-import productsList from "./productList.json";
 import { generateResponse } from "./utils";
-const productsPromise = Promise.resolve(productsList);
+import { createClient } from "./db/client";
+import getProduct from "./db/select-product-by-id.sql";
 
 export const getProductById = async (event) => {
+  console.log("get product with event: ", event);
   try {
-    const { productId } = event.pathParameters;
-    const productsData = await productsPromise;
-    const product = productsData.find((item) => item.id === productId);
+    const client = await createClient();
+    const { id } = event.pathParameters;
+    const dbResponse = await client.query(getProduct, [id]);
+    const product = dbResponse.rows[0];
 
+    client.end();
     if (product) {
       return generateResponse({ body: product });
     }

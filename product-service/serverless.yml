@@ -30,6 +30,7 @@ provider:
 #  region: us-east-1
 plugins:
   - serverless-webpack
+  - serverless-dotenv-plugin
 
 custom:
   webpack:
@@ -84,6 +85,13 @@ functions:
             parameters: 
               paths: 
                 productId: true
+  addProduct: 
+    handler: handler.addProduct
+    events:
+      - http:
+          path: products
+          method: post
+          cors: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
