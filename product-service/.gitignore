@@ -1,8 +1,9 @@
 # package directories
 node_modules
+**/node_modules
 jspm_packages
 yarn.lock
-
+package-lock.json
 # Serverless directories
 .serverless
 

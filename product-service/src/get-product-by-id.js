@@ -12,7 +12,7 @@ export const getProductById = async (event) => {
 
     client.end();
     if (product) {
-      return generateResponse({ body: product });
+      return generateResponse({ body: JSON.stringify(product) });
     }
     return generateResponse({
       code: 404,
