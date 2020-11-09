@@ -7,23 +7,28 @@ export const addProduct = async (event) => {
 
   let client;
   try {
-    const { description, title, price, count } = JSON.parse(event.body);
+    const product = JSON.parse(event.body);
+    const { description, title, price, count } = product;
+
     client = await createClient();
-    const dbResponse = await client.query(createProduct, [
+    await client.query("begin");
+    const queryResult = await client.query(createProduct, [
       description,
       title,
       price,
       count,
     ]);
-
+    await client.query("commit");
     return generateResponse({
+      code: 201,
       body: {
-        ...dbResponse.rows[0],
+        ...queryResult.rows[0],
         count,
       },
     });
   } catch (err) {
     console.error(err);
+    await client.query("rollback");
     return generateResponse({
       code: 500,
       body: { error: "DB error: Cannot insert product" },
