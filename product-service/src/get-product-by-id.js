@@ -7,7 +7,6 @@ export const getProductById = async (event) => {
   let client;
   try {
     client = await createClient();
-    await client.connect();
     const queryResult = await client.query(getProduct, [productId]);
 
     if (queryResult.rows.length) {
