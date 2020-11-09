@@ -17,10 +17,10 @@ export const addProduct = async (event) => {
     ]);
 
     return generateResponse({
-      body: JSON.stringify({
+      body: {
         ...dbResponse.rows[0],
         count,
-      }),
+      },
     });
   } catch (err) {
     console.error(err);

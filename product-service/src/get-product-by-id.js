@@ -13,7 +13,7 @@ export const getProductById = async (event) => {
     if (queryResult.rows.length) {
       const product = queryResult.rows[0];
       client.end();
-      return generateResponse({ body: JSON.stringify(product) });
+      return generateResponse({ body: product });
     }
     return generateResponse({
       code: 404,

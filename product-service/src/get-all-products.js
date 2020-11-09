@@ -10,7 +10,7 @@ export const getAllProducts = async () => {
     const queryResult = await client.query(getProducts);
     const products = queryResult.rows;
     client.end();
-    return generateResponse({ body: JSON.stringify(products) });
+    return generateResponse({ body: products });
   } catch {
     await client.query("rollback");
     return generateResponse({
