@@ -1,15 +1,23 @@
-import productsList from "./productList.json";
 import { generateResponse } from "./utils";
-const productsPromise = Promise.resolve(productsList);
+import { createClient } from "./db/client";
+import getProducts from "./db/select-products.sql";
 
 export const getAllProducts = async () => {
+  let client;
   try {
-    const productsData = await productsPromise;
-    return generateResponse({ body: productsData });
+    client = await createClient();
+    await client.query("begin"); 
+    const queryResult = await client.query(getProducts);
+    const products = queryResult.rows;
+    client.end();
+    return generateResponse({ body: products });
   } catch {
+    await client.query("rollback");
     return generateResponse({
       code: 500,
       body: { error: "Cannot get list of products" },
     });
+  } finally {
+    client && client.end();
   }
 };
