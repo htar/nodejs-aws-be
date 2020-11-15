@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "sls deploy",
+    "build": "serverless package",
     "debug": "sls invoke local --function getAllProducts"
   },
   "author": "",
@@ -16,7 +17,9 @@
     "babel-core": "^6.26.3",
     "babel-preset-es2015": "^6.24.1",
     "dotenv": "^8.2.0",
-    "pg": "^8.4.2"
+    "pg": "^8.4.2",
+    "serverless-iam-roles-per-function": "^2.0.2",
+    "serverless-plugin-webpack": "^1.5.1"
   },
   "devDependencies": {
     "eslint": "^7.13.0",
