@@ -13,12 +13,11 @@ provider:
   stage: dev
   region: eu-west-1
   environment:
-    IMPORT_BUCKET_NAME: ${self:custom.backetName}
+    BUCKET_NAME: ${self:custom.backetName}
     SIGNED_URL_EXPIRATION: 60
-    COPY_PREFIX: processed/
-    IMPORT_FILE_PREFIX: uploaded
+    UPLOAD_FOLDER_NAME: uploaded
+    PARSED_FOLDER_NAME: parsed
     REGION: eu-west-1
-    BUCKET: ${self:custom.backetName}
 
   iamRoleStatements:
     - Effect: "Allow"
