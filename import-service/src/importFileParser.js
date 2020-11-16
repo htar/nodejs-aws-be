@@ -2,7 +2,7 @@
 import { S3 } from "aws-sdk";
 import { generateResponse } from "./utils";
 import { REGION, BUCKET_NAME, UPLOAD_FOLDER_NAME, PARSED_FOLDER_NAME } from "./config";
-import csv from "csv-parser";
+import csvParser from "csv-parser";
 
 export const importFileParser = async (event) => {
 	console.log("event log", event);
@@ -10,37 +10,45 @@ export const importFileParser = async (event) => {
 		const { Records } = event;
 
 		const s3 = new S3({
-			region: REGION,
-			signatureVersion: "v4",
+			region: REGION
 		});
 
 		for (const record of Records) {
 			const { object } = record.s3;
 
-			await s3.getObject({
+			const s3ReadStream = await s3.getObject({
 				Bucket: BUCKET_NAME,
 				Key: object.key,
 			})
-				.createReadStream()
-				.pipe(csv())
+				.createReadStream();
+
+			await new Promise(((resolve, reject) => {
+
+				s3ReadStream.pipe(csvParser())
 				.on("data", (data) => {
 					console.log("Data:", data);
-				});
-
-			await s3
-				.copyObject({
-					Bucket: BUCKET_NAME,
-					CopySource: `${BUCKET_NAME}/${object.key}`,
-					Key: object.key.replace(UPLOAD_FOLDER_NAME, PARSED_FOLDER_NAME),
 				})
-				.promise();
+				.on("end", async () => {
+					await s3
+					.copyObject({
+						Bucket: BUCKET_NAME,
+						CopySource: `${BUCKET_NAME}/${object.key}`,
+						Key: object.key.replace(UPLOAD_FOLDER_NAME, PARSED_FOLDER_NAME),
+					})
+					.promise();
 
-			await s3
-				.deleteObject({
-					Bucket: BUCKET_NAME,
-					Key: object.key,
+				await s3
+					.deleteObject({
+						Bucket: BUCKET_NAME,
+						Key: object.key,
+					})
+					.promise();
+
+				resolve();
 				})
-				.promise();
+				.on("error", (error) => reject(error));
+			}));
+				
 		}
 
 		return generateResponse({
