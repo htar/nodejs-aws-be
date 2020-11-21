@@ -1,0 +1,8 @@
+export const {
+  PARSED_FOLDER_NAME,
+  BUCKET_NAME,
+  SIGNED_URL_EXPIRATION,
+  UPLOAD_FOLDER_NAME,
+  REGION,
+  BUCKET
+} = process.env;

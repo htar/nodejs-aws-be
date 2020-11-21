@@ -1,0 +1,59 @@
+service: import-service
+frameworkVersion: '2'
+
+custom:
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules: true
+  backetName: import-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+  environment:
+    BUCKET_NAME: ${self:custom.backetName}
+    SIGNED_URL_EXPIRATION: 60
+    UPLOAD_FOLDER_NAME: uploaded
+    PARSED_FOLDER_NAME: parsed
+    REGION: eu-west-1
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: "s3:ListBucket"
+      Resource:
+        - "arn:aws:s3:::${self:custom.backetName}"
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource:
+        - "arn:aws:s3:::${self:custom.backetName}/*"
+
+
+plugins:
+  - serverless-plugin-webpack
+  - serverless-iam-roles-per-function 
+  - serverless-dotenv-plugin
+
+functions:
+  importProductsFile:
+    handler: handler.importProductsFile
+    events:
+      - http:
+          path: import
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                name: true
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: ${self:custom.backetName}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
