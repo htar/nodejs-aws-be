@@ -10,7 +10,8 @@ export const importFileParser = async (event) => {
 		const { Records } = event;
 
 		const s3 = new S3({
-			region: REGION
+			region: REGION,
+			signatureVersion: "v4"
 		});
 
 		for (const record of Records) {

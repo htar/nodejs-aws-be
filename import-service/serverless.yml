@@ -1,11 +1,11 @@
-service: import-service
+service: import-service-aws
 frameworkVersion: '2'
 
 custom:
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: true
-  backetName: import-service
+  backetName: import-service-rss
 
 provider:
   name: aws
@@ -22,13 +22,10 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action: "s3:ListBucket"
-      Resource:
-        - "arn:aws:s3:::${self:custom.backetName}"
+      Resource: "arn:aws:s3:::${self:custom.backetName}"
     - Effect: "Allow"
-      Action:
-        - "s3:*"
-      Resource:
-        - "arn:aws:s3:::${self:custom.backetName}/*"
+      Action: "s3:*"
+      Resource: "arn:aws:s3:::${self:custom.backetName}/*"
 
 
 plugins:
@@ -40,20 +37,21 @@ functions:
   importProductsFile:
     handler: handler.importProductsFile
     events:
-      - http:
-          path: import
-          method: get
-          cors: true
-          request:
-            parameters:
-              querystrings:
-                name: true
+    - http:
+        path: import
+        method: get
+        cors: true
+        request:
+          parameters:
+            querystrings:
+              name: true
   importFileParser:
     handler: handler.importFileParser
     events:
-      - s3:
-          bucket: ${self:custom.backetName}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: uploaded/
-          existing: true
+    - s3:
+        bucket: ${self:custom.backetName}
+        event: s3:ObjectCreated:*
+        rules:
+        - prefix: uploaded/
+          suffix: '*'
+        existing: true
